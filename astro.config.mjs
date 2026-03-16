@@ -12,6 +12,7 @@ export default defineConfig({
   integrations: [react()],
 
   adapter: cloudflare({
+    mode: 'directory',
     platformProxy: {
       enabled: true
     }
