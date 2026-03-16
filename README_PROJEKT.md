@@ -12,6 +12,8 @@ npm install
 
 ### 2. Konfiguracja zmiennych środowiskowych
 
+**📘 Szczegółowa instrukcja:** Zobacz [NOCODB_SETUP.md](./NOCODB_SETUP.md) - kompletny przewodnik krok po kroku!
+
 Skopiuj plik `.env.example` do `.env` i uzupełnij dane dostępowe do NocoDB:
 
 ```bash
@@ -26,6 +28,8 @@ NOCODB_TOKEN=your-token-here
 NOCODB_FORM_SUBMISSIONS_TABLE_ID=your-table-id
 NOCODB_FORM_CONTENT_TABLE_ID=your-content-table-id
 ```
+
+> **Potrzebujesz pomocy z NocoDB?** Przeczytaj [NOCODB_SETUP.md](./NOCODB_SETUP.md) - zawiera wszystko czego potrzebujesz!
 
 ### 3. Uruchomienie w trybie deweloperskim
 
@@ -68,12 +72,15 @@ npm run preview
 │   │       ├── StepRenderer.tsx     # Renderer kroków
 │   │       ├── ProgressBar.tsx      # Pasek postępu
 │   │       ├── Navigation.tsx       # Przyciski nawigacji
+│   │       ├── SummaryStep.tsx      # Podsumowanie z sekcjami
 │   │       └── fields/              # Komponenty pól formularza
 │   │           ├── RadioField.tsx
 │   │           ├── CheckboxField.tsx
 │   │           ├── TextField.tsx
 │   │           ├── TextareaField.tsx
 │   │           └── DateField.tsx
+│   ├── styles/
+│   │   └── global.css               # Tailwind CSS + custom theme
 │   └── lib/
 │       ├── types.ts                 # Typy TypeScript
 │       ├── flow.ts                  # Definicja kroków formularza
@@ -98,12 +105,15 @@ npm run preview
 - ✅ Walidacja formularza (frontend + backend)
 - ✅ Autosave (co 5 sekund)
 - ✅ Wznowienie sesji po UUID
-- ✅ Pasek postępu
+- ✅ Pasek postępu z procentami
 - ✅ Integracja z NocoDB (opcjonalna)
-- ✅ Responsywny design (mobile-first)
+- ✅ Responsywny design (mobile-first, Tailwind CSS)
 - ✅ Ścieżka dla kobiet w ciąży
 - ✅ Ścieżka usług ogólnych
 - ✅ Pola warunkowe (np. "inne" z opisem)
+- ✅ Podsumowanie z sekcjami i przyciskami "Edytuj"
+- ✅ Duże kafle odpowiedzi (56px wysokości)
+- ✅ Kolory marki Medi3 (róż #e91e8c)
 
 ### Kroki formularza
 
@@ -214,10 +224,26 @@ Jeśli dodałeś kolumnę w NocoDB, zaktualizuj funkcję `mapAnswersToNocoRecord
 
 ## 🎨 Stylowanie
 
-Style są wbudowane w plik `formularz.astro`. Możesz:
-- Zmienić kolory (zmienne CSS)
-- Dodać własny framework CSS (Tailwind, Bootstrap)
-- Wydzielić style do osobnego pliku
+Projekt używa **Tailwind CSS v4** z custom theme:
+- **Kolory marki:** Róż Medi3 (`#e91e8c`) jako kolor akcent
+- **Mobile-first:** Maksymalna szerokość 480-640px
+- **Tap-targety:** Min. 44px dla łatwego klikania na mobile
+- **Komponenty:** Duże kafle odpowiedzi, eleganckie pola formularza
+
+### Konfiguracja kolorów
+
+Edytuj `src/styles/global.css`:
+```css
+@theme {
+  --color-primary: #e91e8c;        /* Róż Medi3 */
+  --color-primary-dark: #d11a7d;   /* Ciemniejszy róż */
+  --color-primary-light: #f593c5;  /* Jasny róż */
+}
+```
+
+### Dodawanie własnych styli
+
+Możesz rozszerzyć Tailwind w `src/styles/global.css` lub dodać własne komponenty w plikach React/Astro.
 
 ## 🚢 Deployment
 
