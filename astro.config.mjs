@@ -11,12 +11,7 @@ export default defineConfig({
   output: 'server',
   integrations: [react()],
 
-  adapter: cloudflare({
-    mode: 'directory',
-    platformProxy: {
-      enabled: true
-    }
-  }),
+  adapter: cloudflare(),
 
   vite: {
     plugins: [tailwindcss()]
