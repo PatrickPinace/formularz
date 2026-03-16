@@ -195,6 +195,18 @@ export default function FormWizard({
     }
   };
 
+  const handleEditStep = (stepId: string) => {
+    // Znajdź ścieżkę do tego kroku w historii
+    const stepIndex = steps.findIndex((s) => s.id === stepId);
+    if (stepIndex === -1) return;
+
+    // Resetuj historię i przejdź do wybranego kroku
+    setHistory([]);
+    setCurrentStepId(stepId);
+    setErrors({});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (!currentStep) {
     return <div>Błąd: Nie znaleziono kroku formularza</div>;
   }
@@ -202,7 +214,7 @@ export default function FormWizard({
   const isLastStep = currentStep.type === 'summary';
 
   return (
-    <div className="form-wizard">
+    <div className="space-y-6">
       <ProgressBar currentStepIndex={currentStepIndex} totalSteps={steps.length} />
 
       <StepRenderer
@@ -211,6 +223,7 @@ export default function FormWizard({
         errors={errors}
         content={content}
         onFieldChange={handleFieldChange}
+        onEditStep={handleEditStep}
       />
 
       <Navigation
@@ -224,7 +237,7 @@ export default function FormWizard({
       />
 
       {uuid && (
-        <div className="form-info">
+        <div className="mt-4 text-center text-xs text-neutral-400">
           <small>ID sesji: {uuid}</small>
         </div>
       )}

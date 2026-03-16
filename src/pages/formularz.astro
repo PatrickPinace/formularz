@@ -1,4 +1,5 @@
 ---
+import '../styles/global.css';
 import FormWizard from '../components/form/FormWizard';
 import { steps } from '../lib/flow';
 import { getFormContent } from '../lib/content';
@@ -32,276 +33,28 @@ if (draftUuid) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Formularz rejestracyjny - Medi3</title>
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        background: #f5f5f5;
-        padding: 20px;
-      }
-
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        background: white;
-        padding: 40px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      h1 {
-        margin-bottom: 30px;
-        color: #2c3e50;
-      }
-
-      .form-wizard {
-        margin-top: 30px;
-      }
-
-      .progress-bar {
-        margin-bottom: 30px;
-      }
-
-      .progress-bar-info {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 14px;
-        color: #666;
-      }
-
-      .progress-bar-track {
-        height: 8px;
-        background: #e0e0e0;
-        border-radius: 4px;
-        overflow: hidden;
-      }
-
-      .progress-bar-fill {
-        height: 100%;
-        background: #4caf50;
-        transition: width 0.3s ease;
-      }
-
-      .step-content {
-        margin-bottom: 40px;
-      }
-
-      .step-header h2 {
-        margin-bottom: 10px;
-        color: #2c3e50;
-      }
-
-      .step-description {
-        color: #666;
-        margin-bottom: 30px;
-      }
-
-      .step-fields {
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-      }
-
-      .field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      label, legend {
-        font-weight: 600;
-        color: #2c3e50;
-      }
-
-      .required {
-        color: #e74c3c;
-      }
-
-      .help-text {
-        font-size: 14px;
-        color: #666;
-        margin-top: -4px;
-      }
-
-      input[type="text"],
-      input[type="email"],
-      input[type="tel"],
-      input[type="date"],
-      textarea {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 16px;
-        font-family: inherit;
-      }
-
-      textarea {
-        resize: vertical;
-        min-height: 100px;
-      }
-
-      input:focus,
-      textarea:focus {
-        outline: none;
-        border-color: #4caf50;
-      }
-
-      .radio-options,
-      .checkbox-options {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .radio-label,
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        padding: 10px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        transition: background 0.2s;
-      }
-
-      .radio-label:hover,
-      .checkbox-label:hover {
-        background: #f5f5f5;
-      }
-
-      input[type="radio"],
-      input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-      }
-
-      .error-text {
-        color: #e74c3c;
-        font-size: 14px;
-      }
-
-      .navigation {
-        display: flex;
-        gap: 15px;
-        margin-top: 40px;
-        padding-top: 30px;
-        border-top: 1px solid #e0e0e0;
-      }
-
-      .spacer {
-        flex: 1;
-      }
-
-      .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .btn-primary {
-        background: #4caf50;
-        color: white;
-      }
-
-      .btn-primary:hover {
-        background: #45a049;
-      }
-
-      .btn-secondary {
-        background: #e0e0e0;
-        color: #333;
-      }
-
-      .btn-secondary:hover {
-        background: #d0d0d0;
-      }
-
-      .btn-submit {
-        background: #2196f3;
-        color: white;
-      }
-
-      .btn-submit:hover {
-        background: #1976d2;
-      }
-
-      .btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .form-info {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f5f5f5;
-        border-radius: 4px;
-        text-align: center;
-      }
-
-      .form-info small {
-        color: #666;
-        font-size: 12px;
-      }
-
-      .info-step,
-      .summary-step {
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 4px;
-      }
-
-      .summary-step pre {
-        background: white;
-        padding: 20px;
-        border-radius: 4px;
-        overflow-x: auto;
-        font-size: 14px;
-      }
-
-      @media (max-width: 600px) {
-        .container {
-          padding: 20px;
-        }
-
-        body {
-          padding: 10px;
-        }
-
-        .navigation {
-          flex-direction: column;
-        }
-
-        .spacer {
-          display: none;
-        }
-      }
-    </style>
   </head>
-  <body>
-    <div class="container">
-      <h1>Formularz rejestracyjny Medi3</h1>
+  <body class="bg-neutral-50 font-sans text-neutral-800 antialiased">
+    <div class="min-h-screen py-4 px-4 sm:py-8">
+      <div class="mx-auto w-full max-w-[480px] sm:max-w-[640px]">
+        <div class="bg-white rounded-lg shadow-sm p-6 sm:p-8 space-y-6">
+          <h1 class="text-2xl sm:text-3xl font-bold text-neutral-900 mb-6">
+            Formularz rejestracyjny Medi3
+          </h1>
 
-      <FormWizard
-        client:load
-        steps={steps}
-        content={content}
-        initialAnswers={initialAnswers}
-        submissionUuid={submissionUuid}
-      />
+          <FormWizard
+            client:load
+            steps={steps}
+            content={content}
+            initialAnswers={initialAnswers}
+            submissionUuid={submissionUuid}
+          />
+        </div>
+
+        <div class="mt-6 text-center text-sm text-neutral-500 px-4">
+          <p>Twoje dane są przetwarzane przez Fundację Medi3 zgodnie z RODO</p>
+        </div>
+      </div>
     </div>
   </body>
 </html>

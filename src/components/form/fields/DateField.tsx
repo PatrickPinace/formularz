@@ -10,13 +10,13 @@ interface DateFieldProps {
 
 export default function DateField({ field, value, onChange, error, content }: DateFieldProps) {
   return (
-    <div className="field date-field">
-      <label htmlFor={field.id}>
+    <div className="space-y-2">
+      <label htmlFor={field.id} className="block text-base font-semibold text-neutral-700">
         {String(content[field.labelKey] || field.labelKey)}
-        {field.required && <span className="required"> *</span>}
+        {field.required && <span className="text-error ml-1">*</span>}
       </label>
       {field.helpKey && (
-        <p className="help-text">{String(content[field.helpKey] || '')}</p>
+        <p className="text-sm text-neutral-600 -mt-1">{String(content[field.helpKey] || '')}</p>
       )}
       <input
         type="date"
@@ -24,8 +24,9 @@ export default function DateField({ field, value, onChange, error, content }: Da
         name={field.id}
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-3 text-base border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
       />
-      {error && <p className="error-text">{error}</p>}
+      {error && <p className="text-sm text-error mt-1">{error}</p>}
     </div>
   );
 }

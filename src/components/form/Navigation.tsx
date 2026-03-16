@@ -18,19 +18,23 @@ export default function Navigation({
   isSubmitting = false,
 }: NavigationProps) {
   return (
-    <div className="navigation">
+    <div className="flex flex-col sm:flex-row gap-3 mt-8 pt-6 border-t border-neutral-200">
       {canGoBack && (
-        <button type="button" onClick={onBack} className="btn btn-secondary">
+        <button
+          type="button"
+          onClick={onBack}
+          className="px-6 py-3 text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg font-medium transition-colors duration-200 order-2 sm:order-1"
+        >
           ← Wstecz
         </button>
       )}
-      <div className="spacer" />
+      <div className="flex-1" />
       {!isLastStep ? (
         <button
           type="button"
           onClick={onNext}
           disabled={!canGoNext}
-          className="btn btn-primary"
+          className="px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 w-full sm:w-auto min-h-[44px]"
         >
           Dalej →
         </button>
@@ -39,9 +43,9 @@ export default function Navigation({
           type="button"
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="btn btn-submit"
+          className="px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 w-full sm:w-auto min-h-[44px]"
         >
-          {isSubmitting ? 'Wysyłanie...' : 'Wyślij formularz'}
+          {isSubmitting ? 'Wysyłanie...' : 'Wyślij zgłoszenie'}
         </button>
       )}
     </div>

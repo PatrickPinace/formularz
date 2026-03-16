@@ -5,6 +5,7 @@ import CheckboxField from './fields/CheckboxField';
 import TextField from './fields/TextField';
 import TextareaField from './fields/TextareaField';
 import DateField from './fields/DateField';
+import SummaryStep from './SummaryStep';
 
 interface StepRendererProps {
   step: Step;
@@ -12,6 +13,7 @@ interface StepRendererProps {
   errors: Record<string, string>;
   content: Record<string, any>;
   onFieldChange: (fieldId: string, value: any) => void;
+  onEditStep: (stepId: string) => void;
 }
 
 export default function StepRenderer({
@@ -20,6 +22,7 @@ export default function StepRenderer({
   errors,
   content,
   onFieldChange,
+  onEditStep,
 }: StepRendererProps) {
   const renderField = (field: Field) => {
     // Sprawdź widoczność pola
@@ -92,28 +95,36 @@ export default function StepRenderer({
   };
 
   return (
-    <div className="step-content">
-      <div className="step-header">
-        <h2>{String(content[step.titleKey] || step.titleKey)}</h2>
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
+          {String(content[step.titleKey] || step.titleKey)}
+        </h2>
         {step.descriptionKey && (
-          <p className="step-description">
+          <p className="text-base text-neutral-600 leading-relaxed">
             {String(content[step.descriptionKey] || '')}
           </p>
         )}
       </div>
 
-      <div className="step-fields">
+      <div className="space-y-6">
         {step.type === 'info' && (
-          <div className="info-step">
-            <p>{String(content[step.descriptionKey || step.titleKey] || '')}</p>
+          <div className="p-6 bg-neutral-50 border border-neutral-200 rounded-lg">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-base text-neutral-700 leading-relaxed flex-1">
+                {String(content[step.descriptionKey || step.titleKey] || '')}
+              </p>
+            </div>
           </div>
         )}
 
         {step.type === 'summary' && (
-          <div className="summary-step">
-            <h3>Podsumowanie twoich danych</h3>
-            <pre>{JSON.stringify(answers, null, 2)}</pre>
-          </div>
+          <SummaryStep answers={answers} content={content} onEdit={onEditStep} />
         )}
 
         {(step.type === 'question' || step.type === 'group') &&
