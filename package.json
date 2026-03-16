@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && npm run postbuild",
-    "postbuild": "echo 'import worker from \"./server/entry.mjs\";\\nexport default worker;' > dist/_worker.js",
+    "postbuild": "node scripts/postbuild.js",
     "preview": "astro preview",
     "astro": "astro"
   },
