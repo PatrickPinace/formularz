@@ -160,9 +160,15 @@ export default function FormWizard({
   };
 
   const handleSubmit = async () => {
-    if (!uuid) return;
+    console.log('handleSubmit called, uuid:', uuid);
+
+    if (!uuid) {
+      alert('Brak UUID - formularz nie został zainicjalizowany. Odśwież stronę.');
+      return;
+    }
 
     setIsSubmitting(true);
+    console.log('Sending form data to /api/form-submit...');
 
     try {
       const res = await fetch('/api/form-submit', {
@@ -178,14 +184,18 @@ export default function FormWizard({
         }),
       });
 
+      console.log('Response status:', res.status);
+
       if (res.ok) {
         const data = await res.json();
+        console.log('Success:', data);
         alert('Formularz wysłany pomyślnie! Dziękujemy.');
         // Można przekierować użytkownika lub pokazać stronę podziękowania
         window.location.href = '/dziekujemy';
       } else {
         const error = await res.json();
-        alert('Błąd podczas wysyłania formularza: ' + (error.message || 'Nieznany błąd'));
+        console.error('Error response:', error);
+        alert('Błąd podczas wysyłania formularza: ' + (error.error || 'Nieznany błąd'));
       }
     } catch (err) {
       console.error('Failed to submit form:', err);
