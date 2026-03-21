@@ -39,11 +39,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
 
     // Zapisz do NocoDB
-    try {
-      await updateSubmission(submission_uuid, record, env);
-    } catch (nocoError) {
-      console.warn('NocoDB not configured, continuing without persistence:', nocoError);
-    }
+    await updateSubmission(submission_uuid, record, env);
 
     return new Response(
       JSON.stringify({
@@ -58,7 +54,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch (error) {
     console.error('Failed to save draft:', error);
     return new Response(
-      JSON.stringify({ error: 'Failed to save draft' }),
+      JSON.stringify({
+        error: 'Failed to save draft',
+        details: error instanceof Error ? error.message : String(error)
+      }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
