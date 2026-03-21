@@ -48,6 +48,19 @@ export function validateStep(step: Step, answers: Answers): ValidationErrors {
         continue;
       }
     }
+
+    // Walidacja daty porodu - nie może być z przeszłości
+    if (field.id === 'due_date' && field.type === 'date' && value) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dueDate = new Date(String(value));
+      dueDate.setHours(0, 0, 0, 0);
+
+      if (dueDate < today) {
+        errors[field.id] = 'Termin porodu nie może być z przeszłości';
+        continue;
+      }
+    }
   }
 
   return errors;
@@ -81,6 +94,16 @@ export function validateFullForm(answers: Answers): ValidationErrors {
   if (answers.pregnancy_path === 'ciąża_i_położna') {
     if (!answers.due_date) {
       errors.due_date = 'Termin porodu jest wymagany';
+    } else {
+      // Walidacja daty porodu - nie może być z przeszłości
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dueDate = new Date(String(answers.due_date));
+      dueDate.setHours(0, 0, 0, 0);
+
+      if (dueDate < today) {
+        errors.due_date = 'Termin porodu nie może być z przeszłości';
+      }
     }
     if (!answers.midwife_choice) {
       errors.midwife_choice = 'Wybór położnej jest wymagany';

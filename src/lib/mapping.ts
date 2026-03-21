@@ -4,15 +4,23 @@ import type { Answers, FormSubmission, FlowType } from './types';
  * Mapuje odpowiedzi użytkownika do formatu rekordu NocoDB
  */
 export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
-  // Helper do konwersji array na JSON string
-  const arrayToJson = (val: any) => {
-    if (Array.isArray(val)) return JSON.stringify(val);
-    if (typeof val === 'string') return val;
-    return undefined;
-  };
-
   // Helper do konwersji wartości na string
   const toStr = (val: any) => val !== undefined && val !== null ? String(val) : undefined;
+
+  // Helper do zachowania array (dla MultiSelect) lub konwersji na string
+  const toArray = (val: any) => {
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') {
+      // Jeśli to JSON string, sparsuj do array
+      try {
+        const parsed = JSON.parse(val);
+        return Array.isArray(parsed) ? parsed : undefined;
+      } catch {
+        return undefined;
+      }
+    }
+    return undefined;
+  };
 
   // Określamy flow_type na podstawie ścieżki
   let flowType: FlowType | undefined;
@@ -48,21 +56,21 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
     authorized_person: toStr(answers.authorized_person),
     birth_school: toStr(answers.birth_school),
 
-    // Services male (checkbox arrays saved as JSON)
-    services_male_free: arrayToJson(answers.services_male_free),
+    // Services male (MultiSelect arrays)
+    services_male_free: toArray(answers.services_male_free),
     services_male_free_other: toStr(answers.services_male_free_other),
-    services_male_paid: arrayToJson(answers.services_male_paid),
+    services_male_paid: toArray(answers.services_male_paid),
     services_male_paid_other: toStr(answers.services_male_paid_other),
 
-    // Services female (checkbox arrays saved as JSON)
-    services_female_free: arrayToJson(answers.services_female_free),
+    // Services female (MultiSelect arrays)
+    services_female_free: toArray(answers.services_female_free),
     services_female_free_other: toStr(answers.services_female_free_other),
-    services_female_paid: arrayToJson(answers.services_female_paid),
+    services_female_paid: toArray(answers.services_female_paid),
     services_female_paid_other: toStr(answers.services_female_paid_other),
 
     // Contact preferences
     participation_preference: toStr(answers.participation_preference),
-    messengers: arrayToJson(answers.messengers),
+    messengers: toArray(answers.messengers),
     how_found: toStr(answers.how_found),
     how_found_other: toStr(answers.how_found_other),
     additional_notes: toStr(answers.additional_notes),
@@ -79,19 +87,20 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
  * Parsuje rekord z NocoDB do formatu Answers
  */
 export function mapNocoRecordToAnswers(record: any): Answers {
-  // Helper do parsowania JSON array
-  const parseJson = (val: any) => {
+  // Helper do parsowania MultiSelect (już są jako array z NocoDB)
+  const parseArray = (val: any) => {
     if (!val) return undefined;
     if (Array.isArray(val)) return val;
+    // Fallback dla starych danych (JSON string)
     if (typeof val === 'string') {
       try {
         const parsed = JSON.parse(val);
-        return Array.isArray(parsed) ? parsed : val;
+        return Array.isArray(parsed) ? parsed : undefined;
       } catch {
-        return val;
+        return undefined;
       }
     }
-    return val;
+    return undefined;
   };
 
   if (record.raw_answers_json) {
@@ -129,20 +138,20 @@ export function mapNocoRecordToAnswers(record: any): Answers {
     birth_school: record.birth_school,
 
     // Services male
-    services_male_free: parseJson(record.services_male_free),
+    services_male_free: parseArray(record.services_male_free),
     services_male_free_other: record.services_male_free_other,
-    services_male_paid: parseJson(record.services_male_paid),
+    services_male_paid: parseArray(record.services_male_paid),
     services_male_paid_other: record.services_male_paid_other,
 
     // Services female
-    services_female_free: parseJson(record.services_female_free),
+    services_female_free: parseArray(record.services_female_free),
     services_female_free_other: record.services_female_free_other,
-    services_female_paid: parseJson(record.services_female_paid),
+    services_female_paid: parseArray(record.services_female_paid),
     services_female_paid_other: record.services_female_paid_other,
 
     // Contact preferences
     participation_preference: record.participation_preference,
-    messengers: parseJson(record.messengers),
+    messengers: parseArray(record.messengers),
     how_found: record.how_found,
     how_found_other: record.how_found_other,
     additional_notes: record.additional_notes,

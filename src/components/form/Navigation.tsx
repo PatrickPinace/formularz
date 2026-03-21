@@ -6,6 +6,7 @@ interface NavigationProps {
   onNext: () => void;
   onSubmit: () => void;
   isSubmitting?: boolean;
+  errorCount?: number;
 }
 
 export default function Navigation({
@@ -16,9 +17,19 @@ export default function Navigation({
   onNext,
   onSubmit,
   isSubmitting = false,
+  errorCount = 0,
 }: NavigationProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-3 mt-8 pt-6 border-t border-neutral-200">
+    <div className="mt-8">
+      {errorCount > 0 && (
+        <div className="mb-4 p-4 bg-error/10 border border-error/30 rounded-lg">
+          <p className="text-sm font-medium text-error">
+            ⚠️ Uzupełnij {errorCount} {errorCount === 1 ? 'wymagane pole' : errorCount < 5 ? 'wymagane pola' : 'wymaganych pól'}
+          </p>
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-neutral-200">
       {canGoBack && (
         <button
           type="button"
@@ -48,6 +59,7 @@ export default function Navigation({
           {isSubmitting ? 'Wysyłanie...' : 'Wyślij zgłoszenie'}
         </button>
       )}
+      </div>
     </div>
   );
 }

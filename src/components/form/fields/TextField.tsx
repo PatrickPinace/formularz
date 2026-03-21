@@ -27,7 +27,9 @@ export default function TextField({ field, value, onChange, error, content }: Te
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         placeholder={field.placeholder ? String(content[field.placeholder] || '') : ''}
-        className="w-full px-4 py-3 text-base border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px]"
+        className={`w-full px-4 py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all min-h-[44px] ${
+          error ? 'border-error' : 'border-neutral-300'
+        }`}
       />
       {error && <p className="text-sm text-error mt-1">{error}</p>}
     </div>

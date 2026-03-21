@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { Step, Answers, Rule } from '../../lib/types';
 import { validateStep } from '../../lib/validation';
+import { saveDraft, loadDraft, clearDraft } from '../../lib/draftStorage';
 import StepRenderer from './StepRenderer';
 import ProgressBar from './ProgressBar';
 import Navigation from './Navigation';
@@ -38,63 +39,51 @@ export default function FormWizard({
     [steps, currentStepId]
   );
 
-  // Inicjalizacja UUID przy pierwszym renderze
+  // Inicjalizacja formularza przy pierwszym renderze
   useEffect(() => {
-    if (!uuid) {
-      initializeForm();
+    if (uuid) return; // Już zainicjalizowany
+
+    // Sprawdź czy istnieje zapisany draft
+    const draft = loadDraft();
+
+    if (draft) {
+      // Prompt użytkownika czy chce przywrócić draft
+      const shouldRestore = window.confirm(
+        'Znaleziono zapisany szkic formularza. Czy chcesz go przywrócić?'
+      );
+
+      if (shouldRestore) {
+        // Przywróć draft
+        setAnswers(draft.answers);
+        setCurrentStepId(draft.currentStepId);
+        setUuid(draft.uuid);
+        return;
+      } else {
+        // Usuń stary draft
+        clearDraft();
+      }
     }
+
+    // Nowy formularz - wygeneruj UUID
+    const newUuid = crypto.randomUUID();
+    setUuid(newUuid);
+    setAnswers({
+      submission_uuid: newUuid,
+      created_at_client: new Date().toISOString(),
+    });
   }, []);
 
-  // Autosave co 5 sekund
+  // Autosave do localStorage przy każdej zmianie
   useEffect(() => {
     if (!uuid) return;
 
+    // Debounce 1 sekunda
     const timer = setTimeout(() => {
-      saveDraft();
-    }, 5000);
+      saveDraft(answers, currentStepId, uuid);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [answers, currentStepId, uuid]);
-
-  const initializeForm = async () => {
-    try {
-      const res = await fetch('/api/form-start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setUuid(data.submission_uuid);
-        setAnswers((prev) => ({
-          ...prev,
-          submission_uuid: data.submission_uuid,
-          created_at_client: new Date().toISOString(),
-        }));
-      }
-    } catch (err) {
-      console.error('Failed to initialize form:', err);
-    }
-  };
-
-  const saveDraft = async () => {
-    if (!uuid) return;
-
-    try {
-      await fetch('/api/form-save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          submission_uuid: uuid,
-          answers: { ...answers, current_step: currentStepId },
-          current_step: currentStepId,
-        }),
-      });
-    } catch (err) {
-      console.error('Failed to save draft:', err);
-    }
-  };
 
   const handleFieldChange = (fieldId: string, value: any) => {
     setAnswers((prev) => ({ ...prev, [fieldId]: value }));
@@ -135,6 +124,15 @@ export default function FormWizard({
     const stepErrors = validateStep(currentStep, answers);
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
+
+      // Scroll do pierwszego błędu
+      const firstErrorFieldId = Object.keys(stepErrors)[0];
+      const firstErrorElement = document.getElementById(firstErrorFieldId);
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorElement.focus();
+      }
+
       return;
     }
 
@@ -189,6 +187,10 @@ export default function FormWizard({
       if (res.ok) {
         const data = await res.json();
         console.log('Success:', data);
+
+        // Wyczyść draft po pomyślnym wysłaniu
+        clearDraft();
+
         alert('Formularz wysłany pomyślnie! Dziękujemy.');
         // Można przekierować użytkownika lub pokazać stronę podziękowania
         window.location.href = '/dziekujemy';
@@ -244,6 +246,7 @@ export default function FormWizard({
         onNext={handleNext}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
+        errorCount={Object.keys(errors).length}
       />
 
       {uuid && (

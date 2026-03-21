@@ -25,7 +25,9 @@ export default function TextareaField({ field, value, onChange, error, content }
         onChange={(e) => onChange(e.target.value)}
         placeholder={field.placeholder ? String(content[field.placeholder] || '') : ''}
         rows={4}
-        className="w-full px-4 py-3 text-base border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-y"
+        className={`w-full px-4 py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-y ${
+          error ? 'border-error' : 'border-neutral-300'
+        }`}
       />
       {error && <p className="text-sm text-error mt-1">{error}</p>}
     </div>

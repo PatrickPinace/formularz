@@ -78,21 +78,21 @@ export type FormSubmission = {
   authorized_person?: string;
   birth_school?: string;
 
-  // Services male
-  services_male_free?: string; // JSON array
+  // Services male (MultiSelect)
+  services_male_free?: string[];
   services_male_free_other?: string;
-  services_male_paid?: string; // JSON array
+  services_male_paid?: string[];
   services_male_paid_other?: string;
 
-  // Services female
-  services_female_free?: string; // JSON array
+  // Services female (MultiSelect)
+  services_female_free?: string[];
   services_female_free_other?: string;
-  services_female_paid?: string; // JSON array
+  services_female_paid?: string[];
   services_female_paid_other?: string;
 
   // Contact preferences
   participation_preference?: string;
-  messengers?: string; // JSON array
+  messengers?: string[]; // MultiSelect
   how_found?: string;
   how_found_other?: string;
   additional_notes?: string;
