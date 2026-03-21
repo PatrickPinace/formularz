@@ -4,6 +4,16 @@ import type { Answers, FormSubmission, FlowType } from './types';
  * Mapuje odpowiedzi użytkownika do formatu rekordu NocoDB
  */
 export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
+  // Helper do konwersji array na JSON string
+  const arrayToJson = (val: any) => {
+    if (Array.isArray(val)) return JSON.stringify(val);
+    if (typeof val === 'string') return val;
+    return undefined;
+  };
+
+  // Helper do konwersji wartości na string
+  const toStr = (val: any) => val !== undefined && val !== null ? String(val) : undefined;
+
   // Określamy flow_type na podstawie ścieżki
   let flowType: FlowType | undefined;
   if (answers.pregnancy_path === 'ciąża_i_położna') {
@@ -16,18 +26,52 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
     submission_uuid: String(answers.submission_uuid || ''),
     status: (answers.status as any) || 'submitted',
     flow_type: flowType,
-    gender: String(answers.gender || ''),
-    pregnancy_path: answers.pregnancy_path ? String(answers.pregnancy_path) : undefined,
-    ikp_status: answers.ikp_status ? String(answers.ikp_status) : undefined,
-    full_name: answers.full_name ? String(answers.full_name) : undefined,
-    email: answers.email ? String(answers.email) : undefined,
-    phone: answers.phone ? String(answers.phone) : undefined,
-    pesel_or_birthdate: answers.pesel_or_birthdate ? String(answers.pesel_or_birthdate) : undefined,
-    address_main: answers.address_main ? String(answers.address_main) : undefined,
+
+    // Podstawowe dane
+    gender: toStr(answers.gender),
+    pregnancy_path: toStr(answers.pregnancy_path),
+    ikp_status: toStr(answers.ikp_status),
+    full_name: toStr(answers.full_name),
+    email: toStr(answers.email),
+    phone: toStr(answers.phone),
+    pesel_or_birthdate: toStr(answers.pesel_or_birthdate),
+    address_main: toStr(answers.address_main),
+
+    // Pregnancy details
+    midwife_choice: toStr(answers.midwife_choice),
+    due_date: toStr(answers.due_date),
+    pregnancy_care: toStr(answers.pregnancy_care),
+    hospitalization: toStr(answers.hospitalization),
+    multiple_pregnancy: toStr(answers.multiple_pregnancy),
+    postpartum_same_address: toStr(answers.postpartum_same_address),
+    postpartum_address: toStr(answers.postpartum_address),
+    authorized_person: toStr(answers.authorized_person),
+    birth_school: toStr(answers.birth_school),
+
+    // Services male (checkbox arrays saved as JSON)
+    services_male_free: arrayToJson(answers.services_male_free),
+    services_male_free_other: toStr(answers.services_male_free_other),
+    services_male_paid: arrayToJson(answers.services_male_paid),
+    services_male_paid_other: toStr(answers.services_male_paid_other),
+
+    // Services female (checkbox arrays saved as JSON)
+    services_female_free: arrayToJson(answers.services_female_free),
+    services_female_free_other: toStr(answers.services_female_free_other),
+    services_female_paid: arrayToJson(answers.services_female_paid),
+    services_female_paid_other: toStr(answers.services_female_paid_other),
+
+    // Contact preferences
+    participation_preference: toStr(answers.participation_preference),
+    messengers: arrayToJson(answers.messengers),
+    how_found: toStr(answers.how_found),
+    how_found_other: toStr(answers.how_found_other),
+    additional_notes: toStr(answers.additional_notes),
+
+    // Meta
     raw_answers_json: JSON.stringify(answers),
-    current_step: answers.current_step ? String(answers.current_step) : undefined,
-    created_at_client: answers.created_at_client ? String(answers.created_at_client) : undefined,
-    submitted_at_client: answers.submitted_at_client ? String(answers.submitted_at_client) : undefined,
+    current_step: toStr(answers.current_step),
+    created_at_client: toStr(answers.created_at_client),
+    submitted_at_client: toStr(answers.submitted_at_client),
   };
 }
 
@@ -35,6 +79,21 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
  * Parsuje rekord z NocoDB do formatu Answers
  */
 export function mapNocoRecordToAnswers(record: any): Answers {
+  // Helper do parsowania JSON array
+  const parseJson = (val: any) => {
+    if (!val) return undefined;
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') {
+      try {
+        const parsed = JSON.parse(val);
+        return Array.isArray(parsed) ? parsed : val;
+      } catch {
+        return val;
+      }
+    }
+    return val;
+  };
+
   if (record.raw_answers_json) {
     try {
       return JSON.parse(record.raw_answers_json);
@@ -47,6 +106,8 @@ export function mapNocoRecordToAnswers(record: any): Answers {
   return {
     submission_uuid: record.submission_uuid,
     status: record.status,
+
+    // Podstawowe dane
     gender: record.gender,
     pregnancy_path: record.pregnancy_path,
     ikp_status: record.ikp_status,
@@ -55,6 +116,38 @@ export function mapNocoRecordToAnswers(record: any): Answers {
     phone: record.phone,
     pesel_or_birthdate: record.pesel_or_birthdate,
     address_main: record.address_main,
+
+    // Pregnancy details
+    midwife_choice: record.midwife_choice,
+    due_date: record.due_date,
+    pregnancy_care: record.pregnancy_care,
+    hospitalization: record.hospitalization,
+    multiple_pregnancy: record.multiple_pregnancy,
+    postpartum_same_address: record.postpartum_same_address,
+    postpartum_address: record.postpartum_address,
+    authorized_person: record.authorized_person,
+    birth_school: record.birth_school,
+
+    // Services male
+    services_male_free: parseJson(record.services_male_free),
+    services_male_free_other: record.services_male_free_other,
+    services_male_paid: parseJson(record.services_male_paid),
+    services_male_paid_other: record.services_male_paid_other,
+
+    // Services female
+    services_female_free: parseJson(record.services_female_free),
+    services_female_free_other: record.services_female_free_other,
+    services_female_paid: parseJson(record.services_female_paid),
+    services_female_paid_other: record.services_female_paid_other,
+
+    // Contact preferences
+    participation_preference: record.participation_preference,
+    messengers: parseJson(record.messengers),
+    how_found: record.how_found,
+    how_found_other: record.how_found_other,
+    additional_notes: record.additional_notes,
+
+    // Meta
     current_step: record.current_step,
   };
 }

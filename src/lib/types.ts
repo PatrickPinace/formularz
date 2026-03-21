@@ -56,6 +56,8 @@ export type FormSubmission = {
   submission_uuid: string;
   status: SubmissionStatus;
   flow_type?: FlowType;
+
+  // Podstawowe dane
   gender?: string;
   pregnancy_path?: string;
   ikp_status?: string;
@@ -64,6 +66,38 @@ export type FormSubmission = {
   phone?: string;
   pesel_or_birthdate?: string;
   address_main?: string;
+
+  // Pregnancy details
+  midwife_choice?: string;
+  due_date?: string;
+  pregnancy_care?: string;
+  hospitalization?: string;
+  multiple_pregnancy?: string;
+  postpartum_same_address?: string;
+  postpartum_address?: string;
+  authorized_person?: string;
+  birth_school?: string;
+
+  // Services male
+  services_male_free?: string; // JSON array
+  services_male_free_other?: string;
+  services_male_paid?: string; // JSON array
+  services_male_paid_other?: string;
+
+  // Services female
+  services_female_free?: string; // JSON array
+  services_female_free_other?: string;
+  services_female_paid?: string; // JSON array
+  services_female_paid_other?: string;
+
+  // Contact preferences
+  participation_preference?: string;
+  messengers?: string; // JSON array
+  how_found?: string;
+  how_found_other?: string;
+  additional_notes?: string;
+
+  // Meta
   raw_answers_json?: string;
   current_step?: string;
   created_at_client?: string;
