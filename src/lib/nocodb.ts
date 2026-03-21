@@ -50,7 +50,7 @@ export async function createSubmission(record: FormSubmission, env?: any): Promi
 }
 
 /**
- * Aktualizuje istniejący rekord (draft)
+ * Aktualizuje istniejący rekord (draft) lub tworzy nowy jeśli nie istnieje (upsert)
  */
 export async function updateSubmission(uuid: string, record: Partial<FormSubmission>, env?: any): Promise<any> {
   const { url, token, tableId } = getNocoDBConfig(env);
@@ -58,6 +58,8 @@ export async function updateSubmission(uuid: string, record: Partial<FormSubmiss
   if (!url || !token || !tableId) {
     throw new Error('NocoDB is not configured. Missing environment variables.');
   }
+
+  console.log('updateSubmission: Looking for submission with UUID:', uuid);
 
   // Najpierw znajdź rekord po UUID
   const findRes = await fetch(
@@ -70,15 +72,20 @@ export async function updateSubmission(uuid: string, record: Partial<FormSubmiss
   );
 
   if (!findRes.ok) {
+    console.error('updateSubmission: Failed to search for submission:', findRes.status);
     throw new Error('Failed to find submission');
   }
 
   const data = await findRes.json();
+
+  // Jeśli rekord nie istnieje, utwórz nowy (upsert)
   if (!data.list || data.list.length === 0) {
-    throw new Error('Submission not found');
+    console.log('updateSubmission: Submission not found, creating new one (upsert)');
+    return await createSubmission({ submission_uuid: uuid, ...record } as FormSubmission, env);
   }
 
   const recordId = data.list[0].Id;
+  console.log('updateSubmission: Found submission, updating record ID:', recordId);
 
   // Teraz aktualizuj rekord
   const updateRes = await fetch(`${url}/api/v2/tables/${tableId}/records`, {
@@ -92,9 +99,11 @@ export async function updateSubmission(uuid: string, record: Partial<FormSubmiss
 
   if (!updateRes.ok) {
     const text = await updateRes.text();
+    console.error('updateSubmission: Update failed:', updateRes.status, text);
     throw new Error(`NocoDB update failed: ${updateRes.status} ${text}`);
   }
 
+  console.log('updateSubmission: Successfully updated');
   return updateRes.json();
 }
 
