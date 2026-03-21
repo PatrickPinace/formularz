@@ -54,7 +54,6 @@ export type FlowType = 'pregnancy_midwife' | 'general_services';
 
 export type FormSubmission = {
   submission_uuid: string;
-  status: SubmissionStatus;
   flow_type?: FlowType;
 
   // Podstawowe dane
@@ -99,7 +98,6 @@ export type FormSubmission = {
 
   // Meta
   raw_answers_json?: string;
-  current_step?: string;
   created_at_client?: string;
   submitted_at_client?: string;
 };

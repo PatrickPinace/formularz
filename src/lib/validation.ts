@@ -122,8 +122,16 @@ export function validateFullForm(answers: Answers): ValidationErrors {
     }
 
     // Jeśli adres pobytu jest inny, wymagamy go
-    if (answers.postpartum_same_address === 'nie' && !answers.postpartum_address) {
-      errors.postpartum_address = 'Adres pobytu po porodzie jest wymagany';
+    if (answers.postpartum_same_address === 'nie') {
+      if (!answers.postpartum_address_street) {
+        errors.postpartum_address_street = 'Ulica i numer są wymagane';
+      }
+      if (!answers.postpartum_address_postal_code) {
+        errors.postpartum_address_postal_code = 'Kod pocztowy jest wymagany';
+      }
+      if (!answers.postpartum_address_city) {
+        errors.postpartum_address_city = 'Miasto jest wymagane';
+      }
     }
   }
 
@@ -140,8 +148,14 @@ export function validateFullForm(answers: Answers): ValidationErrors {
   if (!answers.pesel_or_birthdate) {
     errors.pesel_or_birthdate = 'PESEL lub data urodzenia jest wymagany';
   }
-  if (!answers.address_main) {
-    errors.address_main = 'Adres jest wymagany';
+  if (!answers.address_main_street) {
+    errors.address_main_street = 'Ulica i numer są wymagane';
+  }
+  if (!answers.address_main_postal_code) {
+    errors.address_main_postal_code = 'Kod pocztowy jest wymagany';
+  }
+  if (!answers.address_main_city) {
+    errors.address_main_city = 'Miasto jest wymagane';
   }
 
   // Walidacja pól "inne" - jeśli wybrano "inne", wymagamy opisu

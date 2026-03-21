@@ -22,6 +22,17 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
     return undefined;
   };
 
+  // Helper do łączenia adresu z osobnych pól
+  const combineAddress = (street?: any, postalCode?: any, city?: any): string | undefined => {
+    const parts = [
+      street ? String(street) : null,
+      postalCode ? String(postalCode) : null,
+      city ? String(city) : null,
+    ].filter(Boolean);
+
+    return parts.length > 0 ? parts.join(', ') : undefined;
+  };
+
   // Określamy flow_type na podstawie ścieżki
   let flowType: FlowType | undefined;
   if (answers.pregnancy_path === 'ciąża_i_położna') {
@@ -32,7 +43,6 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
 
   return {
     submission_uuid: String(answers.submission_uuid || ''),
-    status: (answers.status as any) || 'submitted',
     flow_type: flowType,
 
     // Podstawowe dane
@@ -43,7 +53,11 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
     email: toStr(answers.email),
     phone: toStr(answers.phone),
     pesel_or_birthdate: toStr(answers.pesel_or_birthdate),
-    address_main: toStr(answers.address_main),
+    address_main: combineAddress(
+      answers.address_main_street,
+      answers.address_main_postal_code,
+      answers.address_main_city
+    ),
 
     // Pregnancy details
     midwife_choice: toStr(answers.midwife_choice),
@@ -52,7 +66,11 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
     hospitalization: toStr(answers.hospitalization),
     multiple_pregnancy: toStr(answers.multiple_pregnancy),
     postpartum_same_address: toStr(answers.postpartum_same_address),
-    postpartum_address: toStr(answers.postpartum_address),
+    postpartum_address: combineAddress(
+      answers.postpartum_address_street,
+      answers.postpartum_address_postal_code,
+      answers.postpartum_address_city
+    ),
     authorized_person: toStr(answers.authorized_person),
     birth_school: toStr(answers.birth_school),
 
@@ -77,7 +95,6 @@ export function mapAnswersToNocoRecord(answers: Answers): FormSubmission {
 
     // Meta
     raw_answers_json: JSON.stringify(answers),
-    current_step: toStr(answers.current_step),
     created_at_client: toStr(answers.created_at_client),
     submitted_at_client: toStr(answers.submitted_at_client),
   };
