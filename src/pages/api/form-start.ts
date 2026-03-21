@@ -8,12 +8,18 @@ import { createSubmission } from '../../lib/nocodb';
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     console.log('form-start: Starting...');
-    console.log('form-start: locals exists?', !!locals);
-    console.log('form-start: locals.runtime exists?', !!locals?.runtime);
-    console.log('form-start: locals.runtime.env exists?', !!locals?.runtime?.env);
 
-    // Pobierz env z Cloudflare runtime
-    const env = locals?.runtime?.env;
+    // Astro 6: Import env z cloudflare:workers
+    let env: any;
+    try {
+      const cf = await import('cloudflare:workers');
+      env = cf.env;
+      console.log('form-start: Using cloudflare:workers env');
+    } catch (e) {
+      // Lokalnie cloudflare:workers nie istnieje, użyj import.meta.env
+      env = import.meta.env;
+      console.log('form-start: Using import.meta.env (local)');
+    }
 
     if (env) {
       console.log('form-start: env keys:', Object.keys(env));

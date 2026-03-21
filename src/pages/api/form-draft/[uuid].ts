@@ -8,8 +8,14 @@ import { mapNocoRecordToAnswers } from '../../../lib/mapping';
  */
 export const GET: APIRoute = async ({ params, locals }) => {
   try {
-    // Pobierz env z Cloudflare runtime
-    const env = locals?.runtime?.env;
+    // Astro 6: Import env z cloudflare:workers
+    let env: any;
+    try {
+      const cf = await import('cloudflare:workers');
+      env = cf.env;
+    } catch (e) {
+      env = import.meta.env;
+    }
 
     const { uuid } = params;
 
