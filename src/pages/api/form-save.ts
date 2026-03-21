@@ -6,8 +6,11 @@ import { mapAnswersToNocoRecord } from '../../lib/mapping';
  * Endpoint POST /api/form-save
  * Zapisuje draft formularza (autosave)
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Pobierz env z Cloudflare runtime
+    const env = locals?.runtime?.env;
+
     const payload = await request.json();
     const { submission_uuid, answers, current_step } = payload;
 
@@ -31,7 +34,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Zapisz do NocoDB
     try {
-      await updateSubmission(submission_uuid, record);
+      await updateSubmission(submission_uuid, record, env);
     } catch (nocoError) {
       console.warn('NocoDB not configured, continuing without persistence:', nocoError);
     }

@@ -6,8 +6,11 @@ import { mapNocoRecordToAnswers } from '../../../lib/mapping';
  * Endpoint GET /api/form-draft/:uuid
  * Pobiera draft formularza po UUID
  */
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, locals }) => {
   try {
+    // Pobierz env z Cloudflare runtime
+    const env = locals?.runtime?.env;
+
     const { uuid } = params;
 
     if (!uuid) {
@@ -23,7 +26,7 @@ export const GET: APIRoute = async ({ params }) => {
     // Pobierz z NocoDB
     let record;
     try {
-      record = await getSubmissionByUuid(uuid);
+      record = await getSubmissionByUuid(uuid, env);
     } catch (nocoError) {
       console.warn('NocoDB not configured or failed to fetch:', nocoError);
       return new Response(

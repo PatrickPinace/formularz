@@ -7,8 +7,11 @@ import { validateFullForm } from '../../lib/validation';
  * Endpoint POST /api/form-submit
  * Finalizuje i wysyła formularz
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Pobierz env z Cloudflare runtime
+    const env = locals?.runtime?.env;
+
     const payload = await request.json();
     const { submission_uuid, answers } = payload;
 
@@ -47,7 +50,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Zapisz do NocoDB
     try {
-      await updateSubmission(submission_uuid, record);
+      await updateSubmission(submission_uuid, record, env);
     } catch (nocoError) {
       console.error('Failed to save submission to NocoDB:', nocoError);
       return new Response(

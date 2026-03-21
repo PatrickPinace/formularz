@@ -5,8 +5,11 @@ import { createSubmission } from '../../lib/nocodb';
  * Endpoint POST /api/form-start
  * Tworzy nowy draft formularza i zwraca UUID
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Pobierz env z Cloudflare runtime
+    const env = locals?.runtime?.env;
+
     // Generuj UUID
     const submission_uuid = crypto.randomUUID();
 
@@ -17,7 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
         status: 'draft',
         raw_answers_json: JSON.stringify({}),
         created_at_client: new Date().toISOString(),
-      });
+      }, env);
     } catch (nocoError) {
       // Jeśli NocoDB nie jest skonfigurowane, ignorujemy błąd
       console.warn('NocoDB not configured, continuing without persistence:', nocoError);

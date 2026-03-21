@@ -5,13 +5,18 @@ import type { FormSubmission } from './types';
  */
 
 // Konfiguracja z zmiennych środowiskowych
-const getNocoDBConfig = () => {
-  const url = import.meta.env.NOCODB_URL;
-  const token = import.meta.env.NOCODB_TOKEN;
-  const tableId = import.meta.env.NOCODB_FORM_SUBMISSIONS_TABLE_ID;
+// Przyjmuje env object z Cloudflare runtime lub import.meta.env jako fallback
+const getNocoDBConfig = (env?: any) => {
+  // Na Cloudflare Pages używamy env z runtime, lokalnie import.meta.env
+  const source = env || import.meta.env;
+
+  const url = source.NOCODB_URL;
+  const token = source.NOCODB_TOKEN;
+  const tableId = source.NOCODB_FORM_SUBMISSIONS_TABLE_ID;
 
   if (!url || !token || !tableId) {
     console.warn('NocoDB configuration is incomplete. Check environment variables.');
+    console.warn('Available env keys:', Object.keys(source || {}));
   }
 
   return { url, token, tableId };
@@ -20,8 +25,8 @@ const getNocoDBConfig = () => {
 /**
  * Tworzy nowy rekord w tabeli form_submissions
  */
-export async function createSubmission(record: FormSubmission): Promise<any> {
-  const { url, token, tableId } = getNocoDBConfig();
+export async function createSubmission(record: FormSubmission, env?: any): Promise<any> {
+  const { url, token, tableId } = getNocoDBConfig(env);
 
   if (!url || !token || !tableId) {
     throw new Error('NocoDB is not configured. Missing environment variables.');
@@ -47,8 +52,8 @@ export async function createSubmission(record: FormSubmission): Promise<any> {
 /**
  * Aktualizuje istniejący rekord (draft)
  */
-export async function updateSubmission(uuid: string, record: Partial<FormSubmission>): Promise<any> {
-  const { url, token, tableId } = getNocoDBConfig();
+export async function updateSubmission(uuid: string, record: Partial<FormSubmission>, env?: any): Promise<any> {
+  const { url, token, tableId } = getNocoDBConfig(env);
 
   if (!url || !token || !tableId) {
     throw new Error('NocoDB is not configured. Missing environment variables.');
@@ -96,8 +101,8 @@ export async function updateSubmission(uuid: string, record: Partial<FormSubmiss
 /**
  * Pobiera draft po UUID
  */
-export async function getSubmissionByUuid(uuid: string): Promise<any | null> {
-  const { url, token, tableId } = getNocoDBConfig();
+export async function getSubmissionByUuid(uuid: string, env?: any): Promise<any | null> {
+  const { url, token, tableId } = getNocoDBConfig(env);
 
   if (!url || !token || !tableId) {
     throw new Error('NocoDB is not configured. Missing environment variables.');
@@ -127,9 +132,10 @@ export async function getSubmissionByUuid(uuid: string): Promise<any | null> {
 /**
  * Pobiera treści formularza z tabeli form_content
  */
-export async function getFormContentFromNocoDB(): Promise<any[]> {
-  const { url, token } = getNocoDBConfig();
-  const contentTableId = import.meta.env.NOCODB_FORM_CONTENT_TABLE_ID;
+export async function getFormContentFromNocoDB(env?: any): Promise<any[]> {
+  const { url, token } = getNocoDBConfig(env);
+  const source = env || import.meta.env;
+  const contentTableId = source.NOCODB_FORM_CONTENT_TABLE_ID;
 
   if (!url || !token || !contentTableId) {
     console.warn('Form content table not configured');
