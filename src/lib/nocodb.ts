@@ -59,8 +59,6 @@ export async function updateSubmission(uuid: string, record: Partial<FormSubmiss
     throw new Error('NocoDB is not configured. Missing environment variables.');
   }
 
-  console.log('updateSubmission: Looking for submission with UUID:', uuid);
-
   // Najpierw znajdź rekord po UUID
   const findRes = await fetch(
     `${url}/api/v2/tables/${tableId}/records?where=(submission_uuid,eq,${uuid})`,
@@ -80,12 +78,10 @@ export async function updateSubmission(uuid: string, record: Partial<FormSubmiss
 
   // Jeśli rekord nie istnieje, utwórz nowy (upsert)
   if (!data.list || data.list.length === 0) {
-    console.log('updateSubmission: Submission not found, creating new one (upsert)');
     return await createSubmission({ submission_uuid: uuid, ...record } as FormSubmission, env);
   }
 
   const recordId = data.list[0].Id;
-  console.log('updateSubmission: Found submission, updating record ID:', recordId);
 
   // Teraz aktualizuj rekord
   const updateRes = await fetch(`${url}/api/v2/tables/${tableId}/records`, {
@@ -103,7 +99,6 @@ export async function updateSubmission(uuid: string, record: Partial<FormSubmiss
     throw new Error(`NocoDB update failed: ${updateRes.status} ${text}`);
   }
 
-  console.log('updateSubmission: Successfully updated');
   return updateRes.json();
 }
 
