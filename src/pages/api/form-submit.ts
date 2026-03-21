@@ -21,6 +21,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const payload = await request.json();
     const { submission_uuid, answers } = payload;
 
+    console.log('form-submit: Received submission_uuid:', submission_uuid);
+    console.log('form-submit: Received answers keys:', Object.keys(answers || {}));
+
     if (!submission_uuid) {
       return new Response(
         JSON.stringify({ error: 'Missing submission_uuid' }),
@@ -32,8 +35,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Walidacja pełnego formularza
+    console.log('form-submit: Running validation...');
     const errors = validateFullForm(answers);
+    console.log('form-submit: Validation errors:', errors);
+    console.log('form-submit: Error count:', Object.keys(errors).length);
+
     if (Object.keys(errors).length > 0) {
+      console.error('form-submit: Validation failed with errors:', JSON.stringify(errors));
       return new Response(
         JSON.stringify({
           error: 'Validation failed',
